@@ -24,23 +24,28 @@ const App = () => {
   ];
 
   return (
-    <Router>
-      <div className="flex">
-        <SideBar open={open} setOpen={setOpen} Menus={Menus} />
-        <div className="h-screen flex-1 p-7">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/chatbot" element={<ChatBot />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/files" element={<Files />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/myaccount" element={<MyAccount />} />
-          </Routes>
+    <div className="bg-dark-purple h-screen overflow-hidden">
+      <Router>
+        <div className="flex h-full">
+          <SideBar open={open} setOpen={setOpen} Menus={Menus} />
+          {/* Contenedor de las paginas */}
+          <div className="flex-1 m-5 bg-dark-purple">
+            <div className="bg-white rounded-2xl h-full max-h-full overflow-y-auto p-5">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/chatbot" element={<ChatBot />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/files" element={<Files />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/myaccount" element={<MyAccount />} />
+              </Routes>
+            </div>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </div>
   );
 };
 
