@@ -30,7 +30,7 @@ const App = () => {
           <SideBar open={open} setOpen={setOpen} Menus={Menus} />
           {/* Contenedor de las paginas */}
           <div className="flex-1 m-5 bg-dark-purple">
-            <div className="bg-white rounded-2xl h-full max-h-full overflow-y-auto p-5">
+            <div className="bg-white rounded-2xl h-full "max-h-full overflow-y-auto p-5>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/chatbot" element={<ChatBot />} />
