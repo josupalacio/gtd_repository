@@ -27,11 +27,13 @@ const App = () => {
     <div className="bg-dark-purple h-screen overflow-hidden">
       <Router>
         <div className="flex h-full">
+          {/* Side panel */}
           <SideBar open={open} setOpen={setOpen} Menus={Menus} />
-          {/* Contenedor de las paginas */}
+          {/* Main panel */}
           <div className="flex-1 m-5 bg-dark-purple">
             <div className="bg-white rounded-2xl h-full "max-h-full overflow-y-auto p-5>
               <Routes>
+                {/* Buttons action */}
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/chatbot" element={<ChatBot />} />
                 <Route path="/schedule" element={<Schedule />} />
