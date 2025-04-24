@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "firebase": "^11.6.0",
     "framer-motion": "^6.2.6",
     "pdfreader": "^3.0.7",
     "react": "^18.3.1",
