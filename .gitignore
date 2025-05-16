@@ -1,1 +1,17 @@
-node_modules
+# dependencias
+node_modules/
+
+# build
+dist/
+
+# firebase
+.firebase/
+.firebaserc
+firebase.json
+firebaseConfig.js
+firestore.rules
+firestore.indexes.json
+
+# sistema
+.DS_Store
+.env

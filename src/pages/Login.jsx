@@ -1,20 +1,83 @@
 import { useState } from "react";
+import Swal from 'sweetalert2';
 
 const Login = ({ setUserLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showModal, setShowModal] = useState(false);
 
     const LoginCheckOut = () => {
         if (!(username === "admin" && password === "josuelmejor")) {
-            alert("Login failed, wrong credentials");
+            Swal.fire("Login failed, wrong credentials");
         } else {
-            alert("Well Done You Have Logged in");
+            Swal.fire("Well Done You Have Logged in");
             setUserLogin(true); // Actualiza el estado de login a true
         }
     };
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center">
+            {/* -------- Modal que crea el user -------- */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-lg">
+                        <div className="flex justify-between items-center bg-gray-800 text-white px-4 py-2 rounded-t-lg">
+                            <h2 className="text-lg font-semibold">Datos del nuevo usuario</h2>
+                            <button
+                                className="text-white"
+                                onClick={() => setShowModal(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Nombres</label>
+                                    <input type="text" className="form-input w-full border rounded px-2 py-1" placeholder="Nombre Usuario" autoComplete="off" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Apellido</label>
+                                    <input type="text" className="form-input w-full border rounded px-2 py-1" placeholder="Ejemplo Apellido" autoComplete="off" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Correo</label>
+                                    <input type="email" className="form-input w-full border rounded px-2 py-1" placeholder="name@example.com" autoComplete="off" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Contraseña</label>
+                                    <input type="password" className="form-input w-full border rounded px-2 py-1" placeholder="Contraseña" autoComplete="off" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Activo</label>
+                                    <select className="form-select w-full border rounded px-2 py-1">
+                                        <option value="" disabled>Selecciona un valor</option>
+                                        <option value="1">Sí</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                {/* Aquí puedes mostrar mensajes de error si lo necesitas */}
+                            </div>
+                        </div>
+                        <div className="flex justify-end gap-2 px-4 py-3 border-t">
+                            <button
+                                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                                onClick={() => setShowModal(false)}
+                            >
+                                Cerrar
+                            </button>
+                            <button
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                // onClick={GuardarUsuario} // Implementa esta función si la necesitas
+                            >
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="py-6 px-4">
                 <div className="grid md:grid-cols-2 items-center gap-6 max-w-6xl w-full">
                     <div className="border border-slate-300 rounded-lg p-6 max-w-md shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)] max-md:mx-auto">
@@ -98,7 +161,7 @@ const Login = ({ setUserLogin }) => {
                                 >
                                     Sign in
                                 </button>
-                                <p className="text-sm !mt-6 text-center text-slate-500">Don't have an account <a href="javascript:void(0);" className="text-blue-600 font-medium hover:underline ml-1 whitespace-nowrap">Register here</a></p>
+                                <p className="text-sm !mt-6 text-center text-slate-500">Don't have an account <a onClick={() => setShowModal(true)} href="javascript:void(0);" className="text-blue-600 font-medium hover:underline ml-1 whitespace-nowrap">Register here</a></p>
                             </div>
                         </form>
                     </div>
