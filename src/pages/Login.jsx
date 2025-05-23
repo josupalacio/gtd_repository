@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Swal from 'sweetalert2';
-import SignUpUser from "../components/Msignupuser";
+import Modal_signup from "../components/modal_signup";
 
 const Login = ({ setUserLogin }) => {
     const [username, setUsername] = useState("");
@@ -102,7 +102,7 @@ const Login = ({ setUserLogin }) => {
                                     Sign in
                                 </button>
                                 {/* Renderizamos el modal del sign-up */}
-                                {showModal && <SignUpUser setShowModal={setShowModal} />}
+                                {showModal && <Modal_signup setShowModal={setShowModal} />}
                                 <p
                                     className="text-sm !mt-6 text-center text-slate-500">
                                     Don't have an account
