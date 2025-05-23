@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "getting-things-done-6eea2"
-  }
+    "default": "getting-things-done-6eea2",
+    "gtd": "getting-things-done-6eea2"
+  },
+  "targets": {},
+  "etags": {}
 }

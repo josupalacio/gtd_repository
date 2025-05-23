@@ -1,5 +1,6 @@
 # dependencias
 node_modules/
+bower_components/
 
 # build
 dist/
@@ -11,7 +12,16 @@ firebase.json
 firebaseConfig.js
 firestore.rules
 firestore.indexes.json
+firebaseconect.js
+firebase-debug.log
 
 # sistema
 .DS_Store
 .env
+codigo_src.zip
+*.log
+
+# configuración y otros archivos innecesarios
+package-lock.json
+.vscode/
+.idea/
