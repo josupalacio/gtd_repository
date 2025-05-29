@@ -2,13 +2,12 @@ import { useState } from "react";
 import { ManageAccount } from "../firebaseconnect";
 import Swal from 'sweetalert2'; // Importa SweetAlert
 
-const Modal_signup = ({ setShowModal }) => {
-    // Estados para los campos 
+const ModalSignup = ({ setShowModal }) => {
+    // Datos importantes para el registro 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    // Aunque captures nombre y apellido, Firebase Auth email/password
-    // no los usa directamente en el registro inicial.
-    // Deberías guardarlos en Firestore o Realtime Database después del registro exitoso.
+    const [nickname, setNickname] = useState("")
+    // Datos del usuario
     const [nombre, setNombre] = useState("");
     const [apellido, setApellido] = useState("");
     const [error, setError] = useState(""); // Para errores de validación previa o de Firebase
@@ -23,7 +22,7 @@ const Modal_signup = ({ setShowModal }) => {
             return;
         }
 
-        // Instanciamos la clase (puedes crearla una vez fuera si el componente no se desmonta)
+        // Instanciamos la clase
         const account = new ManageAccount();
 
         try {
@@ -32,16 +31,32 @@ const Modal_signup = ({ setShowModal }) => {
 
             if (result.success) {
                 // Registro exitoso
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Registro Exitoso!',
-                    text: 'Tu cuenta ha sido creada.',
-                    timer: 2000 // Opcional: cierra la alerta después de 2 segundos
-                });
-                // Aquí podrías guardar nombre y apellido en Firestore si lo necesitas
-                // Por ejemplo: await saveUserData(result.user.uid, nombre, apellido);
+                const userId = result.user.uid;
 
-                setShowModal(false); // Cierra el modal al terminar
+                // Guardamos los datos en firestore
+                const saveResult = await account.saveData("users", userId, {
+                    nombre,
+                    apellido,
+                    nickname,
+                    email
+                });
+
+                if (!saveResult.success) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron guardar los datos adicionales'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Registro Exitoso!',
+                        text: 'Tu cuenta ha sido creada.',
+                        timer: 2000 // Opcional: cierra la alerta después de 2 segundos
+                    });
+
+                    setShowModal(false)
+                }
             } else {
                 // Hubo un error en el registro (validación de Firebase, email ya usado, etc.)
                 // Puedes mostrar un mensaje de error más específico basado en result.message
@@ -90,6 +105,45 @@ const Modal_signup = ({ setShowModal }) => {
                 </div>
                 <div className="p-6">
                     <div className="grid grid-cols-2 gap-4">
+                        {/* Estos campos no son manejados por Firebase Auth en createUserWithEmailAndPassword */}
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Nombre</label>
+                            <input
+                                type="text"
+                                className="form-input w-full border rounded px-2 py-1"
+                                placeholder="Nombre Usuario"
+                                autoComplete="off"
+                                value={nombre}
+                                onChange={e => setNombre(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Apellido</label>
+                            <input
+                                type="text"
+                                className="form-input w-full border rounded px-2 py-1"
+                                placeholder="Ejemplo Apellido"
+                                autoComplete="off"
+                                value={apellido}
+                                onChange={e => setApellido(e.target.value)}
+                            />
+                        </div>
+                        {/* --------------------------------------------- */}
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Nick name</label>
+                            <input
+                                type="nickname"
+                                className="form-input w-full border rounded px-2 py-1"
+                                placeholder="nick name"
+                                autoComplete="off"
+                                value={nickname}
+                                onChange={e => setNickname(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <br />
+                        </div>
+                        {/* --------------------------------------------- */}
                         <div>
                             <label className="block text-sm font-medium mb-1">Correo</label>
                             <input
@@ -112,29 +166,6 @@ const Modal_signup = ({ setShowModal }) => {
                                 onChange={e => setPassword(e.target.value)}
                             />
                         </div>
-                        {/* Estos campos no son manejados por Firebase Auth en createUserWithEmailAndPassword */}
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Nombres</label>
-                            <input
-                                type="text"
-                                className="form-input w-full border rounded px-2 py-1"
-                                placeholder="Nombre Usuario"
-                                autoComplete="off"
-                                value={nombre}
-                                onChange={e => setNombre(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Apellido</label>
-                            <input
-                                type="text"
-                                className="form-input w-full border rounded px-2 py-1"
-                                placeholder="Ejemplo Apellido"
-                                autoComplete="off"
-                                value={apellido}
-                                onChange={e => setApellido(e.target.value)}
-                            />
-                        </div>
                     </div>
                     {/* Mostrar el error aquí si existe */}
                     {error && <div className="mt-4 text-red-500 text-sm">{error}</div>}
@@ -154,10 +185,25 @@ const Modal_signup = ({ setShowModal }) => {
                     >
                         Guardar
                     </button>
+                    {/* 
+                    <button
+                        type="button"
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+                        onClick={() => {
+                            setNombre("Fernando");
+                            setApellido("Pérez");
+                            setNickname("prueba1234");
+                            setEmail("juan@example.com");
+                            setPassword("123456")
+                        }}
+                    >
+                        Autocomplete
+                    </button>
+                    */}
                 </div>
             </form>
         </div>
     )
 }
 
-export default Modal_signup;
+export default ModalSignup;

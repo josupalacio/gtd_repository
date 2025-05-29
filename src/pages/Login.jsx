@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Swal from 'sweetalert2';
-import Modal_signup from "../components/modal_signup";
+import ModalSignup from "../components/ModalSignup";
 import { ManageAccount } from "../firebaseconnect"; // Importa ManageAccount
 
 const Login = ({ setUserLogin }) => {
@@ -15,18 +15,18 @@ const Login = ({ setUserLogin }) => {
 
     // Esta función manejará el intento de inicio de sesión usando Firebase Auth
     const handleLogin = async () => { // Hacemos la función async para poder usar await
-         // Validación básica en el cliente
-         if (!email || !password) {
-             Swal.fire({
-                 icon: 'warning',
-                 title: 'Campos incompletos',
-                 text: 'Por favor, ingresa correo y contraseña.',
-             });
-             return; // Detiene la ejecución si falta algún campo
-         }
+        // Validación básica en el cliente
+        if (!email || !password) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos incompletos',
+                text: 'Por favor, ingresa correo y contraseña.',
+            });
+            return; // Detiene la ejecución si falta algún campo
+        }
 
-         // Instanciamos la clase ManageAccount
-         const account = new ManageAccount();
+        // Instanciamos la clase ManageAccount
+        const account = new ManageAccount();
 
         try {
             // Llamamos a la función authenticate de Firebase Auth usando await
@@ -45,17 +45,17 @@ const Login = ({ setUserLogin }) => {
                 // Por ejemplo: history.push('/dashboard');
             } else {
                 // Hubo un error en el inicio de sesión (credenciales inválidas, etc.)
-                 console.error("Error de inicio de sesión de Firebase:", result.message); // Log para depuración
+                console.error("Error de inicio de sesión de Firebase:", result.message); // Log para depuración
 
-                 // Mapear mensajes de error de Firebase a mensajes amigables para el usuario
-                 let friendlyErrorMessage = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
-                  if (result.message.includes('auth/user-not-found')) {
-                      friendlyErrorMessage = 'No existe un usuario con este correo electrónico.';
-                  } else if (result.message.includes('auth/wrong-password')) {
-                       friendlyErrorMessage = 'La contraseña es incorrecta.';
-                  } else if (result.message.includes('auth/invalid-email')) {
-                       friendlyErrorMessage = 'El formato del correo electrónico no es válido.';
-                  } // Puedes añadir más casos según los errores de Firebase que esperes
+                // Mapear mensajes de error de Firebase a mensajes amigables para el usuario
+                let friendlyErrorMessage = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
+                if (result.message.includes('auth/user-not-found')) {
+                    friendlyErrorMessage = 'No existe un usuario con este correo electrónico.';
+                } else if (result.message.includes('auth/wrong-password')) {
+                    friendlyErrorMessage = 'La contraseña es incorrecta.';
+                } else if (result.message.includes('auth/invalid-email')) {
+                    friendlyErrorMessage = 'El formato del correo electrónico no es válido.';
+                } // Puedes añadir más casos según los errores de Firebase que esperes
 
                 Swal.fire({
                     icon: 'error',
@@ -105,7 +105,7 @@ const Login = ({ setUserLogin }) => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)} // Captura el valor del input
                                     />
-                                     {/* Icono de usuario (email) */}
+                                    {/* Icono de usuario (email) */}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                         <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
                                         <path
@@ -129,7 +129,7 @@ const Login = ({ setUserLogin }) => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)} // Captura el valor de la contraseña
                                     />
-                                     {/* Icono de ojo/contraseña */}
+                                    {/* Icono de ojo/contraseña */}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-[18px] h-[18px] absolute right-4 cursor-pointer" viewBox="0 0 128 128">
                                         <path
                                             d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z"
@@ -152,7 +152,7 @@ const Login = ({ setUserLogin }) => {
 
                                 <div className="text-sm">
                                     <a href="javascript:void(0);" className="text-blue-600 hover:underline font-medium">¿Olvidaste tu contraseña?</a> {/* Texto en español */}
-                                     {/* Idealmente, esto activaría una función de recuperación de contraseña de Firebase Auth */}
+                                    {/* Idealmente, esto activaría una función de recuperación de contraseña de Firebase Auth */}
                                 </div>
                             </div>
 
@@ -165,7 +165,7 @@ const Login = ({ setUserLogin }) => {
                                     Iniciar sesión {/* Texto en español */}
                                 </button>
                                 {/* Renderizamos el modal del sign-up */}
-                                {showModal && <Modal_signup setShowModal={setShowModal} />}
+                                {showModal && <ModalSignup setShowModal={setShowModal} />}
                                 <p
                                     className="text-sm !mt-6 text-center text-slate-500">
                                     ¿No tienes una cuenta? {/* Texto en español */}
