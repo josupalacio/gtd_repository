@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ManageAccount } from "../firebaseconnect";
 import Swal from 'sweetalert2'; // Importa SweetAlert
+import { getDocs, getFirestore } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 
 const ModalSignup = ({ setShowModal }) => {
     // Datos importantes para el registro 
@@ -19,6 +21,26 @@ const ModalSignup = ({ setShowModal }) => {
 
         if (!email || !password) {
             setError("Completa correo y contraseña");
+            return;
+        }
+
+        const db = getFirestore();
+
+        // Verificamos la existencia del nickname
+        const qNickname = query(collection(db, "users"), where("nickname", "==" , nickname));
+        const querySnapshotNickname = await getDocs(qNickname);
+
+        if (!querySnapshotNickname.empty) {
+            setError("Nickname en uso, intentalo con otro");
+            return;
+        }
+
+        // Verificamos la existencia del mail
+        const qMail = query(collection(db, "users"), where("mail", "==" , email));
+        const querySnapshotMail = await getDocs(qMail);
+
+        if (!querySnapshotNickname.empty) {
+            setError("Mail en uso, intentalo con otro");
             return;
         }
 
@@ -185,7 +207,7 @@ const ModalSignup = ({ setShowModal }) => {
                     >
                         Guardar
                     </button>
-                    {/* 
+                    {/* */}
                     <button
                         type="button"
                         className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
@@ -199,7 +221,7 @@ const ModalSignup = ({ setShowModal }) => {
                     >
                         Autocomplete
                     </button>
-                    */}
+                    
                 </div>
             </form>
         </div>
