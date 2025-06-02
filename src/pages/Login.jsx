@@ -39,8 +39,6 @@ const Login = ({ setUserLogin }) => {
                     timer: 2000 // La alerta se cierra automáticamente después de 2 segundos
                 });
                 setUserLogin(true); // Actualiza el estado de login a true en tu aplicación padre
-                // Aquí podrías usar react-router-dom u otra librería para redirigir
-                // Por ejemplo: history.push('/dashboard');
             } else {
                 // Hubo un error en el inicio de sesión (credenciales inválidas, etc.)
                 console.error("Error de inicio de sesión de Firebase:", result.message); // Log para depuración
@@ -191,6 +189,7 @@ const Login = ({ setUserLogin }) => {
                                 >
                                     Iniciar sesión {/* Texto en español */}
                                 </button>
+                                
                                 {/* Renderizamos el modal del sign-up */}
                                 {showSignupModal && <ModalSignup setShowModal={setShowSignupModal} />}
                                 <p

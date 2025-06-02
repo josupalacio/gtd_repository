@@ -1,61 +1,291 @@
-import React, { memo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import styled from "styled-components";
+import logo from "../assets/favicon.png"; // Cambia por tu logo si quieres
+import { v } from "../styles/Variables";
+import {
+    AiOutlineLeft,
+    AiOutlineHome,
+    AiOutlineApartment,
+    AiOutlineSetting,
+} from "react-icons/ai";
+import { MdOutlineAnalytics, MdLogout } from "react-icons/md";
+import { NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { ThemeContext } from "../App"; // Asegúrate de tener este contexto
 
-const SideBar = ({ open, setOpen, Menus }) => {
+export function Sidebar({ sidebarOpen, setSidebarOpen }) {
+    const ModSidebaropen = () => setSidebarOpen(!sidebarOpen);
+    const { setTheme, theme } = useContext(ThemeContext);
+    const CambiarTheme = () => setTheme((theme) => (theme === "light" ? "dark" : "light"));
+
     return (
-        <div className="min-h-screen m-5 bg-dark-purple">
-            <div
-                className={`${open ? "w-72" : "w-20"
-                    } bg-dark-purple min-h-screen p-5 pt-5 relative duration-300`}
-            >
-                <img
-                    src="./src/assets/control.png"
-                    className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple
-           border-2 rounded-full ${!open && "rotate-180"}`}
-                    onClick={() => setOpen(!open)}
-                />
-                <div className="flex gap-x-4 items-center">
-                    <img
-                        src="./src/assets/logo.png"
-                        className={`rounded-md cursor-pointer duration-500 ${open && "rotate-[360deg]"
-                            }`}
-                    />
-                    <h1
-                        className={`text-white origin-left font-medium text-xl duration-200 ${!open && "scale-0"
-                            }`}
-                    >
-                        Getting Things Done
-                    </h1>
+        <Container isOpen={sidebarOpen} themeUse={theme}>
+            <button className="Sidebarbutton" onClick={ModSidebaropen}>
+                <AiOutlineLeft />
+            </button>
+            {/* 
+            <div className="Logocontent">
+                <div className="imgcontent">
+                    <img src={logo} alt="Logo" />
                 </div>
-                <ul className="pt-6">
-                    {Menus.map((Menu, index) => (
-                        <MenuItem key={index} Menu={Menu} open={open} />
-                    ))}
-                </ul>
+                <h2>codigo369</h2>
             </div>
-        </div>
+            */}
+            {linksArray.map(({ icon, label, to }) => (
+                <div className="LinkContainer" key={label}>
+                    <NavLink
+                        to={to}
+                        className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
+                    >
+                        <div className="Linkicon">{icon}</div>
+                        {sidebarOpen && <span>{label}</span>}
+                    </NavLink>
+                </div>
+            ))}
+            <Divider />
+            {secondarylinksArray.map(({ icon, label, to }) => (
+                <div className="LinkContainer" key={label}>
+                    <NavLink
+                        to={to}
+                        className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
+                    >
+                        <div className="Linkicon">{icon}</div>
+                        {sidebarOpen && <span>{label}</span>}
+                    </NavLink>
+                </div>
+            ))}
+            <Divider />
+            <div className="Themecontent">
+                {sidebarOpen && <span className="titletheme">Dark mode</span>}
+                <div className="Togglecontent">
+                    <div className="grid theme-container">
+                        <div className="content">
+                            <div className="demo">
+                                <label className="switch" istheme={theme}>
+                                    <input
+                                        istheme={theme}
+                                        type="checkbox"
+                                        className="theme-swither"
+                                        onClick={CambiarTheme}
+                                    />
+                                    <span istheme={theme} className="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Container>
     );
-};
+}
 
-const MenuItem = memo(({ Menu, open }) => {
-    const location = useLocation(); // Obtiene la ruta actual
+//#region Data links
+const linksArray = [
+    {
+        label: "Home",
+        icon: <AiOutlineHome />,
+        to: "/",
+    },
+    {
+        label: "Estadisticas",
+        icon: <MdOutlineAnalytics />,
+        to: "/estadisticas",
+    },
+    {
+        label: "Productos",
+        icon: <AiOutlineApartment />,
+        to: "/productos",
+    },
+    {
+        label: "Diagramas",
+        icon: <MdOutlineAnalytics />,
+        to: "/diagramas",
+    },
+    {
+        label: "Reportes",
+        icon: <MdOutlineAnalytics />,
+        to: "/reportes",
+    },
+];
+const secondarylinksArray = [
+    {
+        label: "Configuración",
+        icon: <AiOutlineSetting />,
+        to: "/null",
+    },
+    {
+        label: "Salir",
+        icon: <MdLogout />,
+        to: "/null",
+    },
+];
+//#endregion
 
-    // Verifica si la ruta actual coincide con la ruta del menú
-    const isActive = location.pathname === Menu.path;
+//#region STYLED COMPONENTS
+const Container = styled.div`
+  color: ${(props) => props.theme.text};
+  background: ${(props) => props.theme.bg};
+  position: sticky;
+  padding-top: 20px;
+  .Sidebarbutton {
+    position: absolute;
+    top: ${v.xxlSpacing};
+    right: -18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: ${(props) => props.theme.bgtgderecha};
+    box-shadow: 0 0 4px ${(props) => props.theme.bg3},
+      0 0 7px ${(props) => props.theme.bg};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    transform: ${({ isOpen }) => (isOpen ? `initial` : `rotate(180deg)`)};
+    border: none;
+    letter-spacing: inherit;
+    color: inherit;
+    font-size: inherit;
+    text-align: inherit;
+    padding: 0;
+    font-family: inherit;
+    outline: none;
+  }
+  .Logocontent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: ${v.lgSpacing};
+    .imgcontent {
+      display: flex;
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      cursor: pointer;
+      transition: all 0.3s;
+      transform: ${({ isOpen }) => (isOpen ? `scale(0.7)` : `scale(1.5)`)};
+    }
+    h2 {
+      display: ${({ isOpen }) => (isOpen ? `block` : `none`)};
+    }
+  }
+  .LinkContainer {
+    margin: 8px 0;
+    padding: 0 15%;
+    :hover {
+      background: ${(props) => props.theme.bg3};
+    }
+    .Links {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      padding: calc(${v.smSpacing}-2px) 0;
+      color: ${(props) => props.theme.text};
+      height:50px;
+      .Linkicon {
+        padding: ${v.smSpacing} ${v.mdSpacing};
+        display: flex;
+        svg {
+          font-size: 25px;
+        }
+      }
+      &.active {
+        .Linkicon {
+          svg {
+            color: ${(props) => props.theme.bg4};
+          }
+        }
+      }
+    }
+  }
+  .Themecontent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .titletheme {
+      display: block;
+      padding: 10px;
+      font-weight: 700;
+      opacity: ${({ isOpen }) => (isOpen ? `1` : `0`)};
+      transition: all 0.3s;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .Togglecontent {
+      margin: ${({ isOpen }) => (isOpen ? `auto 40px` : `auto 15px`)};
+      width: 36px;
+      height: 20px;
+      border-radius: 10px;
+      transition: all 0.3s;
+      position: relative;
+      .theme-container {
+        background-blend-mode: multiply, multiply;
+        transition: 0.4s;
+        .grid {
+          display: grid;
+          justify-items: center;
+          align-content: center;
+          height: 100vh;
+          width: 100vw;
+          font-family: "Lato", sans-serif;
+        }
+        .demo {
+          font-size: 32px;
+          .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            .theme-swither {
+              opacity: 0;
+              width: 0;
+              height: 0;
+              &:checked + .slider:before {
+                left: 4px;
+                content: "🌑";
+                transform: translateX(26px);
+              }
+            }
+            .slider {
+              position: absolute;
+              cursor: pointer;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: ${({ themeUse }) =>
+        themeUse === "light" ? v.lightcheckbox : v.checkbox};
+              transition: 0.4s;
+              &::before {
+                position: absolute;
+                content: "☀️";
+                height: 0px;
+                width: 0px;
+                left: -10px;
+                top: 16px;
+                line-height: 0px;
+                transition: 0.4s;
+              }
+              &.round {
+                border-radius: 34px;
+                &::before {
+                  border-radius: 50%;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+const Divider = styled.div`
+  height: 1px;
+  width: 100%;
+  background: ${(props) => props.theme.bg3};
+  margin: ${v.lgSpacing} 0;
+`;
+//#endregion
 
-    return (
-        <li
-            className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-sm items-center gap-x-4 
-            ${Menu.gap ? "mt-9" : "mt-2"} ${isActive ? "bg-light-white text-white" : "text-gray-300"}`}
-        >
-            <Link to={Menu.path} className="flex items-center gap-x-4">
-                <img src={`./src/assets/${Menu.src}.png`} />
-                <span className={`${!open && "hidden"} origin-left duration-200`}>
-                    {Menu.title}
-                </span>
-            </Link>
-        </li>
-    );
-});
-
-export default SideBar;
+export default Sidebar;
