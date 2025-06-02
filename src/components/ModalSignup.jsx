@@ -27,7 +27,7 @@ const ModalSignup = ({ setShowModal }) => {
         const db = getFirestore();
 
         // Verificamos la existencia del nickname
-        const qNickname = query(collection(db, "users"), where("nickname", "==" , nickname));
+        const qNickname = query(collection(db, "users"), where("nickname", "==", nickname));
         const querySnapshotNickname = await getDocs(qNickname);
 
         if (!querySnapshotNickname.empty) {
@@ -36,7 +36,7 @@ const ModalSignup = ({ setShowModal }) => {
         }
 
         // Verificamos la existencia del mail
-        const qMail = query(collection(db, "users"), where("mail", "==" , email));
+        const qMail = query(collection(db, "users"), where("mail", "==", email));
         const querySnapshotMail = await getDocs(qMail);
 
         if (!querySnapshotNickname.empty) {
@@ -207,7 +207,7 @@ const ModalSignup = ({ setShowModal }) => {
                     >
                         Guardar
                     </button>
-                    {/* */}
+                    {/* Usar para pruebas 
                     <button
                         type="button"
                         className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
@@ -221,7 +221,7 @@ const ModalSignup = ({ setShowModal }) => {
                     >
                         Autocomplete
                     </button>
-                    
+                    */}
                 </div>
             </form>
         </div>
