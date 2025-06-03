@@ -2,27 +2,32 @@ import styled from "styled-components";
 import logo from "../assets/favicon.png"; // Cambia por tu logo si quieres
 import { v } from "../styles/Variables";
 import {
-    AiOutlineLeft,
-    AiOutlineHome,
-    AiOutlineApartment,
-    AiOutlineSetting,
+  AiOutlineLeft,
+  AiOutlineHome,
+  AiOutlineApartment,
+  AiOutlineSetting,
+  AiOutlineComment,
 } from "react-icons/ai";
+import {
+  PiUsersFour,
+} from "react-icons/pi"
 import { MdOutlineAnalytics, MdLogout } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import { ThemeContext } from "../App"; // Asegúrate de tener este contexto
+import Swal from "sweetalert2";
 
-export function Sidebar({ sidebarOpen, setSidebarOpen }) {
-    const ModSidebaropen = () => setSidebarOpen(!sidebarOpen);
-    const { setTheme, theme } = useContext(ThemeContext);
-    const CambiarTheme = () => setTheme((theme) => (theme === "light" ? "dark" : "light"));
+export function Sidebar({ sidebarOpen, setSidebarOpen, setUserLogin }) {
+  const ModSidebaropen = () => setSidebarOpen(!sidebarOpen);
+  const { setTheme, theme } = useContext(ThemeContext);
+  const CambiarTheme = () => setTheme((theme) => (theme === "light" ? "dark" : "light"));
 
-    return (
-        <Container isOpen={sidebarOpen} themeUse={theme}>
-            <button className="Sidebarbutton" onClick={ModSidebaropen}>
-                <AiOutlineLeft />
-            </button>
-            {/* 
+  return (
+    <Container isOpen={sidebarOpen} themeUse={theme}>
+      <button className="Sidebarbutton" onClick={ModSidebaropen}>
+        <AiOutlineLeft />
+      </button>
+      {/* 
             <div className="Logocontent">
                 <div className="imgcontent">
                     <img src={logo} alt="Logo" />
@@ -30,93 +35,120 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 <h2>codigo369</h2>
             </div>
             */}
-            {linksArray.map(({ icon, label, to }) => (
-                <div className="LinkContainer" key={label}>
-                    <NavLink
-                        to={to}
-                        className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
-                    >
-                        <div className="Linkicon">{icon}</div>
-                        {sidebarOpen && <span>{label}</span>}
-                    </NavLink>
-                </div>
-            ))}
-            <Divider />
-            {secondarylinksArray.map(({ icon, label, to }) => (
-                <div className="LinkContainer" key={label}>
-                    <NavLink
-                        to={to}
-                        className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
-                    >
-                        <div className="Linkicon">{icon}</div>
-                        {sidebarOpen && <span>{label}</span>}
-                    </NavLink>
-                </div>
-            ))}
-            <Divider />
-            <div className="Themecontent">
-                {sidebarOpen && <span className="titletheme">Dark mode</span>}
-                <div className="Togglecontent">
-                    <div className="grid theme-container">
-                        <div className="content">
-                            <div className="demo">
-                                <label className="switch" istheme={theme}>
-                                    <input
-                                        istheme={theme}
-                                        type="checkbox"
-                                        className="theme-swither"
-                                        onClick={CambiarTheme}
-                                    />
-                                    <span istheme={theme} className="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      {linksArray.map(({ icon, label, to }) => (
+        <div className="LinkContainer" key={label}>
+          <NavLink
+            to={to}
+            className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
+          >
+            <div className="Linkicon">{icon}</div>
+            {sidebarOpen && <span>{label}</span>}
+          </NavLink>
+        </div>
+      ))}
+      <Divider />
+      {secondarylinksArray.map(({ icon, label, to }) => (
+        <div className="LinkContainer" key={label}>
+          {label === "Salir" ? (
+            <div
+              className="Links"
+              style={{ cursor: "pointer" }}
+              onClick={async () => {
+                await Swal.fire({
+                  title: "Cerrando sesión...",
+                  timer: 2000,
+                  timerProgressBar: true,
+                  showConfirmButton: false,
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  didOpen: () => {
+                    Swal.showLoading();
+                  },
+                });
+                setUserLogin(false)
+              }
+
+              }
+            >
+              <div className="Linkicon">{icon}</div>
+              {sidebarOpen && <span>{label}</span>}
             </div>
-        </Container>
-    );
+          ) : (
+            <NavLink
+              to={to}
+              className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
+            >
+              <div className="Linkicon">{icon}</div>
+              {sidebarOpen && <span>{label}</span>}
+            </NavLink>
+          )}
+        </div>
+      ))
+      }
+      <Divider />
+      <div className="Themecontent">
+        {sidebarOpen && <span className="titletheme">Dark mode</span>}
+        <div className="Togglecontent">
+          <div className="grid theme-container">
+            <div className="content">
+              <div className="demo">
+                <label className="switch" istheme={theme}>
+                  <input
+                    istheme={theme}
+                    type="checkbox"
+                    className="theme-swither"
+                    onClick={CambiarTheme}
+                  />
+                  <span istheme={theme} className="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container >
+  );
 }
 
 //#region Data links
 const linksArray = [
-    {
-        label: "Home",
-        icon: <AiOutlineHome />,
-        to: "/",
-    },
-    {
-        label: "Estadisticas",
-        icon: <MdOutlineAnalytics />,
-        to: "/estadisticas",
-    },
-    {
-        label: "Productos",
-        icon: <AiOutlineApartment />,
-        to: "/productos",
-    },
-    {
-        label: "Diagramas",
-        icon: <MdOutlineAnalytics />,
-        to: "/diagramas",
-    },
-    {
-        label: "Reportes",
-        icon: <MdOutlineAnalytics />,
-        to: "/reportes",
-    },
+  {
+    label: "Home",
+    icon: <AiOutlineHome />,
+    to: "/",
+  },
+  {
+    label: "Estadisticas",
+    icon: <MdOutlineAnalytics />,
+    to: "/estadisticas",
+  },
+  {
+    label: "Productos",
+    icon: <AiOutlineApartment />,
+    to: "/productos",
+  },
+  {
+    label: "ChatBot",
+    icon: <AiOutlineComment   />,
+    to: "/Chatbot",
+  },
+  {
+    label: "Forum",
+    icon: <PiUsersFour />,
+    to: "/Forum",
+  },
 ];
 const secondarylinksArray = [
-    {
-        label: "Configuración",
-        icon: <AiOutlineSetting />,
-        to: "/null",
-    },
-    {
-        label: "Salir",
-        icon: <MdLogout />,
-        to: "/null",
-    },
+  {
+    label: "Configuración",
+    icon: <AiOutlineSetting />,
+    to: "/null",
+  },
+  {
+    label: "Salir",
+    icon: <MdLogout />,
+    to: "/null",
+  },
 ];
 //#endregion
 
@@ -126,6 +158,7 @@ const Container = styled.div`
   background: ${(props) => props.theme.bg};
   position: sticky;
   padding-top: 20px;
+  
   .Sidebarbutton {
     position: absolute;
     top: ${v.xxlSpacing};
@@ -255,7 +288,7 @@ const Container = styled.div`
               right: 0;
               bottom: 0;
               background: ${({ themeUse }) =>
-        themeUse === "light" ? v.lightcheckbox : v.checkbox};
+    themeUse === "light" ? v.lightcheckbox : v.checkbox};
               transition: 0.4s;
               &::before {
                 position: absolute;

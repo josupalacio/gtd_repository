@@ -21,7 +21,7 @@ function App() {
   const [theme, setTheme] = useState("light");
   const themeStyle = theme === "light" ? Light : Dark;
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [userLogin, setUserLogin] = useState(false); // Cambia a false en producción
+  const [userLogin, setUserLogin] = useState(true); // Cambia a false en producción
 
   if (!userLogin) {
     return <Login setUserLogin={setUserLogin} />;
@@ -32,7 +32,7 @@ function App() {
       <ThemeProvider theme={themeStyle}>
         <BrowserRouter>
           <Container className={sidebarOpen ? "sidebarState active" : ""}>
-            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setUserLogin={setUserLogin} />
             <MainContent>
               {/* Aquí van tus rutas */}
               <Routes>

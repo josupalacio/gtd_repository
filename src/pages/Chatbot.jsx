@@ -135,24 +135,33 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="flex-1 h-screen p-7 bg-white">
+    <div className="flex flex-col h-screen p-7">
+      {/* Titulo */}
       <h1 style={{ userSelect: "none" }} className="text-2xl font-semibold text-center mb-4">
         {getGreeting()}
       </h1>
 
-      <div className=""flex flex-grow justify-center items-center>
-        <div className="w-full max-w-md h-[400px] border rounded-lg p-4 overflow-y-auto space-y-2 bg-gray-50">
+      {/* Mensajes */}
+      <div className="flex-1 flex justify-end">
+        <div className="
+          w-full
+          border 
+          rounded-lg
+          p-4 
+          overflow-y-auto 
+          space-y-2 
+          bg-gray-50
+          max-h-[80vh]">
           {messages.map((msg, idx) => (
             <div
               key={idx}
               className={`flex ${msg.from === "bot" ? "justify-start" : "justify-end"}`}
             >
               <div
-                className={`rounded-xl px-4 py-2 text-sm ${
-                  msg.from === "bot"
-                    ? "bg-gray-300 text-black rounded-bl-none"
-                    : "bg-blue-500 text-white rounded-br-none"
-                }`}
+                className={`rounded-xl px-4 py-2 text-sm ${msg.from === "bot"
+                  ? "bg-gray-300 text-black rounded-bl-none"
+                  : "bg-blue-500 text-white rounded-br-none"
+                  }`}
               >
                 {msg.text}
               </div>
@@ -173,21 +182,36 @@ const ChatBot = () => {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center space-x-2">
-        <input
-          type="text"
-          className="border-2 border-gray-500 rounded-lg p-2 w-full"
-          placeholder="Pregunta lo que quieras"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button
-          onClick={handleSend}
-          className="border-2 border-gray-500 rounded-lg p-2 w-[40px] h-[40px] flex items-center justify-center"
-        >
-          💬
-        </button>
+      {/* Input del usuario */}
+      <div className="justify-end">
+        <div className="mt-4 flex items-center space-x-2">
+          <input
+            type="text"
+            className="
+            border-2 
+            border-gray-300 
+            bg-white rounded-lg 
+            p-3 
+            w-full"
+            placeholder="Pregunta lo que quieras"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            onClick={handleSend}
+            className="
+            border-2 
+            border-gray-300 
+            bg-white rounded-lg 
+            p-2 
+            flex 
+            items-center 
+            justify-center"
+          >
+            💬
+          </button>
+        </div>
       </div>
     </div>
   );
