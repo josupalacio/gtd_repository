@@ -3,6 +3,13 @@ import { ManageAccount } from "../firebaseconnect"; // Importa ManageAccount
 import Swal from 'sweetalert2';
 import ModalSignup from "../components/ModalSignup";
 import ForgotPassword from "../components/ForgotPassword"
+import {
+    getAuth,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
+    signInWithEmailAndPassword
+} from "firebase/auth";
 
 const Login = ({ setUserLogin }) => {
     const [email, setEmail] = useState("");
@@ -10,6 +17,7 @@ const Login = ({ setUserLogin }) => {
     const [showSignupModal, setShowSignupModal] = useState(false); //control del modal
     const [showFPasswordModal, setShowFPasswordModal] = useState(false); //control del modal
     const [showPassword, setShowPassword] = useState(false); //control de la visibilidad de la contraseña
+    const [rememberMe, setRememberMe] = useState(false); // recordar usuario logeado
 
     // Esta función manejará el intento de inicio de sesión usando Firebase Auth
     const handleLogin = async () => {
@@ -23,49 +31,66 @@ const Login = ({ setUserLogin }) => {
             return; // Detiene la ejecución si falta algún campo
         }
 
-        // Instanciamos la clase ManageAccount
-        const account = new ManageAccount();
+        const auth = getAuth(); // <-- Obtenemos la instancia de Auth
 
         try {
-            // Llamamos a la función authenticate de Firebase Auth usando await
-            const result = await account.authenticate(email, password); // Usamos await para esperar la respuesta
+            // 1. Establecemos la persistencia segun el checkbox ANTES de iniciar sesión
+            await setPersistence(
+                auth, // Usamos esta instancia de auth
+                rememberMe ? browserLocalPersistence : browserSessionPersistence
+            );
 
-            if (result.success) {
-                // Inicio de sesión exitoso según Firebase
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Inicio de Sesión Exitoso!',
-                    text: 'Bienvenido de nuevo a Getting things done.', // Mensaje más personalizado
-                    timer: 2000 // La alerta se cierra automáticamente después de 2 segundos
-                });
-                setUserLogin(true); // Actualiza el estado de login a true en tu aplicación padre
-            } else {
-                // Hubo un error en el inicio de sesión (credenciales inválidas, etc.)
-                console.error("Error de inicio de sesión de Firebase:", result.message); // Log para depuración
+            // 2. Ahora, realizamos el inicio de sesión usando la MISMA instancia de auth
+            // Esta llamada intentará logear al usuario y lanzará un error si falla.
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-                // Mapear mensajes de error de Firebase a mensajes amigables para el usuario
-                let friendlyErrorMessage = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
-                if (result.message.includes('auth/user-not-found')) {
+            // Si llegamos aquí, signInWithEmailAndPassword FUE exitoso (no lanzó error)
+            Swal.fire({
+                icon: 'success',
+                title: '¡Inicio de Sesión Exitoso!',
+                text: 'Bienvenido de nuevo a Getting things done.',
+                timer: 2000
+            });
+
+            // Opcional: Puedes acceder al usuario logeado con userCredential.user
+            // console.log("Usuario logeado:", userCredential.user);
+
+        } catch (error) { // <-- Capturamos CUALQUIER error que haya ocurrido arriba (incluido de signInWithEmailAndPassword)
+            // El inicio de sesión falló.
+            console.error("Error de inicio de sesión:", error.message); // Log para depuración
+
+            // Mapear mensajes de error de Firebase Auth a mensajes amigables para el usuario
+            let friendlyErrorMessage = 'Ocurrió un error al intentar iniciar sesión. Intenta de nuevo.'; // Mensaje por defecto
+
+            // Los códigos de error de Firebase Auth empiezan con "auth/"
+            switch (error.code) {
+                case 'auth/user-not-found':
                     friendlyErrorMessage = 'No existe un usuario con este correo electrónico.';
-                } else if (result.message.includes('auth/wrong-password')) {
+                    break;
+                case 'auth/wrong-password':
                     friendlyErrorMessage = 'La contraseña es incorrecta.';
-                } else if (result.message.includes('auth/invalid-email')) {
+                    break;
+                case 'auth/invalid-email':
                     friendlyErrorMessage = 'El formato del correo electrónico no es válido.';
-                } // Puedes añadir más casos según los errores de Firebase que esperes
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de Inicio de Sesión',
-                    text: friendlyErrorMessage,
-                });
+                    break;
+                case 'auth/invalid-credential': // Este error también puede ocurrir en algunos casos de credenciales inválidas
+                     friendlyErrorMessage = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
+                     break;
+                case 'auth/user-disabled':
+                    friendlyErrorMessage = 'Tu cuenta ha sido deshabilitada.';
+                    break;
+                // Puedes añadir más casos si lo necesitas (auth/too-many-requests, etc.)
+                default:
+                    // Para errores no mapeados o inesperados
+                    console.error("Código de error de Firebase no mapeado:", error.code); // Log adicional para debug
+                    friendlyErrorMessage = 'Ocurrió un error inesperado al intentar iniciar sesión. Intenta de nuevo.';
+                    break;
             }
-        } catch (err) {
-            // Captura cualquier otro error inesperado durante la llamada
-            console.error("Error inesperado durante el inicio de sesión:", err);
+
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'Ocurrió un error inesperado al intentar iniciar sesión. Intenta de nuevo.',
+                title: 'Error de Inicio de Sesión',
+                text: friendlyErrorMessage,
             });
         }
     };
@@ -165,6 +190,9 @@ const Login = ({ setUserLogin }) => {
                                         name="remember-me"
                                         type="checkbox"
                                         className="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                                        // Check para recordar al usuario
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                        checked={rememberMe}
                                     />
                                     <label htmlFor="remember-me" className="ml-3 block text-sm text-slate-500">Recordarme</label> {/* Texto en español */}
                                 </div>
@@ -189,7 +217,7 @@ const Login = ({ setUserLogin }) => {
                                 >
                                     Iniciar sesión {/* Texto en español */}
                                 </button>
-                                
+
                                 {/* Renderizamos el modal del sign-up */}
                                 {showSignupModal && <ModalSignup setShowModal={setShowSignupModal} />}
                                 <p

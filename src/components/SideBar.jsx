@@ -17,7 +17,7 @@ import { useContext } from "react";
 import { ThemeContext } from "../App"; // Asegúrate de tener este contexto
 import Swal from "sweetalert2";
 
-export function Sidebar({ sidebarOpen, setSidebarOpen, setUserLogin }) {
+export function Sidebar({ sidebarOpen, setSidebarOpen, user, onSignOut }) {
   const ModSidebaropen = () => setSidebarOpen(!sidebarOpen);
   const { setTheme, theme } = useContext(ThemeContext);
   const CambiarTheme = () => setTheme((theme) => (theme === "light" ? "dark" : "light"));
@@ -65,7 +65,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, setUserLogin }) {
                     Swal.showLoading();
                   },
                 });
-                setUserLogin(false)
+                onSignOut();
               }
 
               }
@@ -106,6 +106,29 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, setUserLogin }) {
           </div>
         </div>
       </div>
+      <Divider />
+      {/* datos del usuario */}
+      <UserSection>
+        <div className="avatar-container">
+          <img
+            src={
+              theme === "light"
+                ? "https://img.icons8.com/?size=100&id=23264&format=png&color=000000"
+                : "https://img.icons8.com/?size=100&id=23264&format=png&color=ffffff"
+            }
+            alt="Avatar"
+            className="avatar-img"
+          />
+        </div>
+        {sidebarOpen && (
+          <span className="username">
+            {user?.firestoreData?.nickname ||
+              user?.firebaseUser?.displayName ||
+              user?.firebaseUser?.email ||
+              "Usuario"}
+          </span>
+        )}
+      </UserSection>
     </Container >
   );
 }
@@ -129,7 +152,7 @@ const linksArray = [
   },
   {
     label: "ChatBot",
-    icon: <AiOutlineComment   />,
+    icon: <AiOutlineComment />,
     to: "/Chatbot",
   },
   {
@@ -248,7 +271,7 @@ const Container = styled.div`
     .Togglecontent {
       margin: ${({ isOpen }) => (isOpen ? `auto 40px` : `auto 15px`)};
       width: 36px;
-      height: 20px;
+      height: 30px;
       border-radius: 10px;
       transition: all 0.3s;
       position: relative;
@@ -318,6 +341,36 @@ const Divider = styled.div`
   width: 100%;
   background: ${(props) => props.theme.bg3};
   margin: ${v.lgSpacing} 0;
+`;
+
+const UserSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin: 16px 0 16px 0;
+  padding: 0 15%;
+  .avatar-container {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid ${(theme) => theme.text};
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${(props) => props.theme.bg2};
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .username {
+    font-weight: 600;
+    font-size: 1rem;
+    color: ${(props) => props.theme.text};
+    white-space: nowrap;
+  }
 `;
 //#endregion
 
