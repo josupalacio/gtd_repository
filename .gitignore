@@ -8,12 +8,16 @@ dist/
 # firebase
 .firebase/
 .firebaserc
+
 firebase.json
 firebaseConfig.js
 firestore.rules
 firestore.indexes.json
-firebaseconect.js
+firebaseconnect.js
 firebase-debug.log
+
+src/supabaseClient.js
+src/firebaseconnect.js
 
 # sistema
 .DS_Store

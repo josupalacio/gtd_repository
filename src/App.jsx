@@ -2,17 +2,21 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { Light, Dark } from "./styles/Themes";
+import styled from "styled-components";
+
+// importamos componentes
 import Sidebar from "./components/Sidebar";
+
+// User auth
+import Login from "./pages/Login";
+
+// importamos las páginas
 import Dashboard from "./pages/Dashboard";
 import ChatBot from "./pages/Chatbot";
-import Schedule from "./pages/Schedule";
-import Search from "./pages/Search";
-import Analytics from "./pages/Analytics";
-import Files from "./pages/Files";
-import Settings from "./pages/Settings";
-import MyAccount from "./pages/MyAccount";
-import Login from "./pages/Login";
-import styled from "styled-components";
+import EditProfile from "./pages/EditProfile";
+import Forum from "./pages/Forum";
+import Profile from "./pages/Profile"
+
 
 // Firebase imports
 import { auth, ManageAccount } from "./firebaseconnect"; // Importamos auth Y ManageAccount
@@ -56,8 +60,6 @@ function App() {
   const handleSignOut = async () => {
     const accountManager = new ManageAccount();
     await accountManager.signOut(); // Llama al método de Firebase signOut
-    // onAuthStateChanged se disparará automáticamente y pondrá currentUserData a null,
-    // lo que hará que App se re-renderice y muestre el Login.
   };
 
 
@@ -68,11 +70,6 @@ function App() {
 
   // Si después de cargar, no hay usuario autenticado (currentUserData es null), redirigimos al Login
   if (!currentUserData) {
-     // ¡UNICAMENTE nos basamos en currentUserData!
-     // IMPORTANTE: Tu componente Login DEBE manejar el inicio de sesión con Firebase.
-     // Cuando signInWithEmailAndPassword sea exitoso en Login, onAuthStateChanged
-     // aquí en App se disparará y actualizará currentUserData (incluyendo datos de firestore),
-     // lo que hará que App se re-renderice y entre al bloque principal de la aplicación.
     return <Login />; // No pasamos setUserLogin aquí, el Login solo necesita hacer el auth con firebase
   }
 
@@ -92,17 +89,15 @@ function App() {
               onSignOut={handleSignOut} // <-- ¡Aquí pasamos la función para cerrar sesión!
             />
             <MainContent>
+              
               <Routes>
                 {/* Rutas protegidas que solo se ven si currentUserData no es null */}
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/chatbot" element={<ChatBot />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/files" element={<Files />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/myaccount" element={<MyAccount />} />
-                 {/* Agregamos Navigate para redirigir si el usuario va a una ruta no definida mientras está logueado */}
+                <Route path="/editprofile" element={<EditProfile />} />
+                <Route path="/forum" element={<Forum />} />
+                <Route path="/profile" element={<Profile user={currentUserData} />} />
+                {/* Agregamos Navigate para redirigir si el usuario va a una ruta no definida mientras está logueado */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </MainContent>

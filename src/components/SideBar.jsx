@@ -10,7 +10,7 @@ import {
 } from "react-icons/ai";
 import {
   PiUsersFour,
-} from "react-icons/pi"
+} from "react-icons/pi";
 import { MdOutlineAnalytics, MdLogout } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
@@ -27,14 +27,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, user, onSignOut }) {
       <button className="Sidebarbutton" onClick={ModSidebaropen}>
         <AiOutlineLeft />
       </button>
-      {/* 
-            <div className="Logocontent">
-                <div className="imgcontent">
-                    <img src={logo} alt="Logo" />
-                </div>
-                <h2>codigo369</h2>
-            </div>
-            */}
       {linksArray.map(({ icon, label, to }) => (
         <div className="LinkContainer" key={label}>
           <NavLink
@@ -107,28 +99,36 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, user, onSignOut }) {
         </div>
       </div>
       <Divider />
-      {/* datos del usuario */}
-      <UserSection>
-        <div className="avatar-container">
-          <img
-            src={
-              theme === "light"
-                ? "https://img.icons8.com/?size=100&id=23264&format=png&color=000000"
-                : "https://img.icons8.com/?size=100&id=23264&format=png&color=ffffff"
-            }
-            alt="Avatar"
-            className="avatar-img"
-          />
-        </div>
-        {sidebarOpen && (
-          <span className="username">
-            {user?.firestoreData?.nickname ||
-              user?.firebaseUser?.displayName ||
-              user?.firebaseUser?.email ||
-              "Usuario"}
-          </span>
-        )}
-      </UserSection>
+      {profileLinkArray.map(({ to }) => (
+        <NavLink
+          to={to}
+          className={({ isActive }) => `Links${isActive ? ` active` : ``}`}
+          style={{ textDecoration: "none" }}
+          key={to}
+        >
+          <UserSection style={{ cursor: "pointer" }}>
+            <div className="avatar-container">
+              <img
+                src={
+                  theme === "light"
+                    ? "https://img.icons8.com/?size=100&id=23264&format=png&color=000000"
+                    : "https://img.icons8.com/?size=100&id=23264&format=png&color=ffffff"
+                }
+                alt="Avatar"
+                className="avatar-img"
+              />
+            </div>
+            {sidebarOpen && (
+              <span className="username">
+                {user?.firestoreData?.nickname ||
+                  user?.firebaseUser?.displayName ||
+                  user?.firebaseUser?.email ||
+                  "Usuario"}
+              </span>
+            )}
+          </UserSection>
+        </NavLink>
+      ))}
     </Container >
   );
 }
@@ -165,7 +165,7 @@ const secondarylinksArray = [
   {
     label: "Configuración",
     icon: <AiOutlineSetting />,
-    to: "/null",
+    to: "/editprofile",
   },
   {
     label: "Salir",
@@ -173,6 +173,11 @@ const secondarylinksArray = [
     to: "/null",
   },
 ];
+const profileLinkArray = [
+  {
+    to: "/profile"
+  }
+]
 //#endregion
 
 //#region STYLED COMPONENTS
