@@ -4,13 +4,22 @@ import { v } from "../styles/Variables";
 import {
   AiOutlineLeft,
   AiOutlineHome,
-  AiOutlineApartment,
   AiOutlineSetting,
   AiOutlineComment,
 } from "react-icons/ai";
 import {
+  FaTasks
+} from "react-icons/fa";
+import {
   PiUsersFour,
 } from "react-icons/pi";
+import {
+  IoIosTimer, // icono del timer
+} from "react-icons/io";
+import {
+  TiMessages,
+} from "react-icons/ti"
+
 import { MdOutlineAnalytics, MdLogout } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
@@ -141,14 +150,14 @@ const linksArray = [
     to: "/",
   },
   {
-    label: "Estadisticas",
-    icon: <MdOutlineAnalytics />,
-    to: "/estadisticas",
+    label: "Pomodoro",
+    icon: <IoIosTimer />,
+    to: "/Pomodoro",
   },
   {
-    label: "Productos",
-    icon: <AiOutlineApartment />,
-    to: "/productos",
+    label: "Check-List",
+    icon: <FaTasks />,
+    to: "/Checklist",
   },
   {
     label: "ChatBot",
@@ -159,6 +168,11 @@ const linksArray = [
     label: "Forum",
     icon: <PiUsersFour />,
     to: "/Forum",
+  },
+  {
+    label: "Messages",
+    icon: <TiMessages />,
+    to: "/Messages",
   },
 ];
 const secondarylinksArray = [
@@ -263,7 +277,8 @@ const Container = styled.div`
   .Themecontent {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 12px;
     .titletheme {
       display: block;
       padding: 10px;
@@ -275,8 +290,9 @@ const Container = styled.div`
     }
     .Togglecontent {
       margin: ${({ isOpen }) => (isOpen ? `auto 40px` : `auto 15px`)};
-      width: 36px;
-      height: 30px;
+      width: fit-content;
+      height: fit-content;
+      bottom: 10px; 
       border-radius: 10px;
       transition: all 0.3s;
       position: relative;
@@ -287,8 +303,8 @@ const Container = styled.div`
           display: grid;
           justify-items: center;
           align-content: center;
-          height: 100vh;
-          width: 100vw;
+          height: 100%;
+          width: 100%;
           font-family: "Lato", sans-serif;
         }
         .demo {
@@ -321,11 +337,14 @@ const Container = styled.div`
               &::before {
                 position: absolute;
                 content: "☀️";
-                height: 0px;
-                width: 0px;
-                left: -10px;
-                top: 16px;
-                line-height: 0px;
+                height: 28px;
+                width: 28px;
+                left: 4px;
+                top: 3px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
                 transition: 0.4s;
               }
               &.round {

@@ -135,7 +135,7 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen p-7">
+    <div className="flex flex-col max-h-[100vh]">
       {/* Titulo */}
       <h1 style={{ userSelect: "none" }} className="text-2xl font-semibold text-center mb-4">
         {getGreeting()}
@@ -151,7 +151,7 @@ const ChatBot = () => {
           overflow-y-auto 
           space-y-2 
           bg-gray-50
-          max-h-[80vh]">
+          h-[78vh]">
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -192,7 +192,8 @@ const ChatBot = () => {
             border-gray-300 
             bg-white rounded-lg 
             p-3 
-            w-full"
+            w-full
+            "
             placeholder="Pregunta lo que quieras"
             value={input}
             onChange={(e) => setInput(e.target.value)}

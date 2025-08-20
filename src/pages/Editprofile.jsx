@@ -1,85 +1,116 @@
 import { useState } from "react";
 import styled from "styled-components";
-//import { storage } from "../firebaseconnect"; // Ajusta la ruta según tu proyecto
-//import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import supabase from "../supabaseClient";
 
 const defaultAvatar =
- "https://img.icons8.com/?size=100&id=23264&format=png&color=000000";
+  "https://img.icons8.com/?size=100&id=23264&format=png&color=000000";
 
 const EditProfile = ({
- initialName = "",
- initialAvatar = defaultAvatar,
- userId = "",
- onSave,
+  initialName = "",
+  initialAvatar = defaultAvatar,
+  userId = "",
+  onSave,
+  theme = "light"
 }) => {
- const [name, setName] = useState(initialName);
- const [avatar, setAvatar] = useState(initialAvatar);
- const [avatarFile, setAvatarFile] = useState(null);
- const [avatarError, setAvatarError] = useState(null);
- const [avatarUploading, setAvatarUploading] = useState(false);
- const [bio, setBio] = useState("");
- const [status, setStatus] = useState("");
+  const [name, setName] = useState(initialName);
+  const [avatar, setAvatar] = useState(initialAvatar);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarError, setAvatarError] = useState(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [bio, setBio] = useState("");
+  const [status, setStatus] = useState("");
 
 
- const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file && file.type.startsWith("image/")) {
-   setAvatarFile(file);
-   setAvatar(URL.createObjectURL(file));
-   setAvatarError(null);
-  } else {
-   setAvatarError("Solo se permiten imágenes.");
-  }
- };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setAvatarFile(file);
+      setAvatar(URL.createObjectURL(file));
+      setAvatarError(null);
+    } else {
+      setAvatarError("Solo se permiten imágenes.");
+    }
+  };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setAvatarError(null);
-  setAvatarUploading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setAvatarError(null);
+    setAvatarUploading(true);
 
-  let avatarURL = avatar;
+    let avatarURL = avatar;
 
-  // Si el usuario seleccionó una nueva imagen, súbela a Firebase Storage
-  if (avatarFile && userId) {
-   try {
-    const storageRef = ref(storage, `avatars/${userId}`);
-    await uploadBytes(storageRef, avatarFile);
-    avatarURL = await getDownloadURL(storageRef);
-   } catch (err) {
-    setAvatarError("Error al subir la imagen.");
+    // Subimos el avatar a supabase storage
+    if (avatarFile && userId) {
+      const fileExt = avatarFile.name.split('.').pop()
+      const filePath = `avatar_${userId}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, avatarFile, { upsert: true });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        setAvatarError("Error al subir la imagen: " + uploadError.message);
+        setAvatarUploading(false);
+        return;
+      }
+
+      // Obtenemos la url
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+      avatarURL = data.publicUrl;
+    }
+
+    // Actualizamos los datos en la tabla users
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        name,
+        avatar: avatarURL,
+        bio,
+        status
+      })
+      .eq('uid', userId);
+
+    if (updateError) {
+      setAvatarError("Error al actualizar el perfil.");
+      setAvatarUploading(false);
+      return;
+    }
+
+    // Llamamos onSave si existe
+    if (onSave) {
+      await onSave({
+        name,
+        avatar: avatarURL,
+        bio,
+        status,
+      });
+    }
+
     setAvatarUploading(false);
-    return;
-   }
-  }
+  };
 
-  // Llama a la función onSave para guardar los cambios en Firestore o donde corresponda
-  if (onSave) {
-   await onSave({
-    name,
-    avatar: avatarURL,
-    bio,
-    status,
-   });
-  }
-
-  setAvatarUploading(false);
- };
-
- return (
-  <Wrapper>
-   <h2>Editar Perfil</h2>
-   <Form onSubmit={handleSubmit}>
-    <AvatarSection>
-     <label>Foto de perfil</label>
-     <AvatarPreview src={avatar} alt="avatar" />
-     <input
-      type="file"
-      accept="image/*"
-      onChange={handleImageChange}
-      style={{ marginTop: "10px" }}
-     />
-    </AvatarSection>
-    <Fields>
+  return (
+    <Wrapper>
+      <h2>Editar Perfil</h2>
+      <Form onSubmit={handleSubmit}>
+        <AvatarSection>
+          <label>Foto de perfil</label>
+          <AvatarPreview src={
+            avatar ||
+              (theme === "light"
+              ? "https://img.icons8.com/?size=100&id=23264&format=png&color=000000"
+              : "https://img.icons8.com/?size=100&id=23264&format=png&color=ffffff")
+          } alt="avatar" />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{ marginTop: "10px" }}
+          />
+        </AvatarSection>
+        <Fields>
           <label>
             Nombre
             <input
@@ -108,13 +139,13 @@ const EditProfile = ({
             />
           </label>
         </Fields>
-    {avatarError && <ErrorMsg>{avatarError}</ErrorMsg>}
-    <Button type="submit" disabled={avatarUploading}>
-     {avatarUploading ? "Guardando..." : "Guardar"}
-    </Button>
-   </Form>
-  </Wrapper>
- );
+        {avatarError && <ErrorMsg>{avatarError}</ErrorMsg>}
+        <Button type="submit" disabled={avatarUploading}>
+          {avatarUploading ? "Guardando..." : "Guardar"}
+        </Button>
+      </Form>
+    </Wrapper>
+  );
 };
 
 const Wrapper = styled.div`

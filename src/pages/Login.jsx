@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { ManageAccount } from "../firebaseconnect"; // Importa ManageAccount
 import Swal from 'sweetalert2';
 import ModalSignup from "../components/ModalSignup";
-import ForgotPassword from "../components/ForgotPassword"
+import ForgotPassword from "../components/ForgotPassword";
 import {
     getAuth,
     setPersistence,
@@ -11,86 +10,48 @@ import {
     signInWithEmailAndPassword
 } from "firebase/auth";
 
-const Login = ({ setUserLogin }) => {
+const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showSignupModal, setShowSignupModal] = useState(false); //control del modal
-    const [showFPasswordModal, setShowFPasswordModal] = useState(false); //control del modal
-    const [showPassword, setShowPassword] = useState(false); //control de la visibilidad de la contraseña
-    const [rememberMe, setRememberMe] = useState(false); // recordar usuario logeado
+    const [showSignupModal, setShowSignupModal] = useState(false);
+    const [showFPasswordModal, setShowFPasswordModal] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
 
-    // Esta función manejará el intento de inicio de sesión usando Firebase Auth
     const handleLogin = async () => {
-        // Validación básica en el cliente
         if (!email || !password) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Campos incompletos',
                 text: 'Por favor, ingresa correo y contraseña.',
             });
-            return; // Detiene la ejecución si falta algún campo
+            return;
         }
 
-        const auth = getAuth(); // <-- Obtenemos la instancia de Auth
+        const auth = getAuth();
 
         try {
-            // 1. Establecemos la persistencia segun el checkbox ANTES de iniciar sesión
             await setPersistence(
-                auth, // Usamos esta instancia de auth
+                auth,
                 rememberMe ? browserLocalPersistence : browserSessionPersistence
             );
 
-            // 2. Ahora, realizamos el inicio de sesión usando la MISMA instancia de auth
-            // Esta llamada intentará logear al usuario y lanzará un error si falla.
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email, password);
 
-            // Si llegamos aquí, signInWithEmailAndPassword FUE exitoso (no lanzó error)
             Swal.fire({
                 icon: 'success',
                 title: '¡Inicio de Sesión Exitoso!',
                 text: 'Bienvenido de nuevo a Getting things done.',
                 timer: 2000
+            }).then(() => {
+                // Aquí puedes redirigir o actualizar el estado global si lo necesitas
             });
 
-            // Opcional: Puedes acceder al usuario logeado con userCredential.user
-            // console.log("Usuario logeado:", userCredential.user);
-
-        } catch (error) { // <-- Capturamos CUALQUIER error que haya ocurrido arriba (incluido de signInWithEmailAndPassword)
-            // El inicio de sesión falló.
-            console.error("Error de inicio de sesión:", error.message); // Log para depuración
-
-            // Mapear mensajes de error de Firebase Auth a mensajes amigables para el usuario
-            let friendlyErrorMessage = 'Ocurrió un error al intentar iniciar sesión. Intenta de nuevo.'; // Mensaje por defecto
-
-            // Los códigos de error de Firebase Auth empiezan con "auth/"
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    friendlyErrorMessage = 'No existe un usuario con este correo electrónico.';
-                    break;
-                case 'auth/wrong-password':
-                    friendlyErrorMessage = 'La contraseña es incorrecta.';
-                    break;
-                case 'auth/invalid-email':
-                    friendlyErrorMessage = 'El formato del correo electrónico no es válido.';
-                    break;
-                case 'auth/invalid-credential': // Este error también puede ocurrir en algunos casos de credenciales inválidas
-                     friendlyErrorMessage = 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.';
-                     break;
-                case 'auth/user-disabled':
-                    friendlyErrorMessage = 'Tu cuenta ha sido deshabilitada.';
-                    break;
-                // Puedes añadir más casos si lo necesitas (auth/too-many-requests, etc.)
-                default:
-                    // Para errores no mapeados o inesperados
-                    console.error("Código de error de Firebase no mapeado:", error.code); // Log adicional para debug
-                    friendlyErrorMessage = 'Ocurrió un error inesperado al intentar iniciar sesión. Intenta de nuevo.';
-                    break;
-            }
-
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error de Inicio de Sesión',
-                text: friendlyErrorMessage,
+                text: 'Correo o contraseña incorrectos.',
             });
         }
     };
@@ -103,8 +64,8 @@ const Login = ({ setUserLogin }) => {
                         <form
                             className="space-y-6"
                             onSubmit={(e) => {
-                                e.preventDefault(); // Previene el recargo de la página por defecto
-                                handleLogin(); // Llama a nuestra nueva función de inicio de sesión
+                                e.preventDefault();
+                                handleLogin();
                             }}>
                             <div className="mb-12">
                                 <h3 className="text-slate-900 text-3xl font-semibold">Sign in</h3>
@@ -112,31 +73,21 @@ const Login = ({ setUserLogin }) => {
                                     Sign in to your account and explore a world of possibilities. Your journey begins here.
                                 </p>
                             </div>
-
                             <div>
-                                <label className="text-slate-800 text-sm font-medium mb-2 block">Correo electrónico</label> {/* Etiqueta más precisa */}
+                                <label className="text-slate-800 text-sm font-medium mb-2 block">Correo electrónico</label>
                                 <div className="relative flex items-center">
                                     <input
-                                        name="email" // Cambiado a 'email'
-                                        type="email" // Tipo email para validación básica del navegador
+                                        name="email"
+                                        type="email"
                                         required
                                         className="w-full text-sm text-slate-800 border border-slate-300 pl-4 pr-10 py-3 rounded-lg outline-blue-600"
-                                        placeholder="Ingresa tu correo" // Placeholder más claro
-                                        autoComplete="email" // Ayuda con autocompletado
+                                        placeholder="Ingresa tu correo"
+                                        autoComplete="email"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)} // Captura el valor del input
+                                        onChange={(e) => setEmail(e.target.value)}
                                     />
-                                    {/* Icono de usuario (email) */}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" className="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
-                                        <circle cx="10" cy="7" r="6" data-original="#000000"></circle>
-                                        <path
-                                            d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z"
-                                            data-original="#000000"
-                                        ></path>
-                                    </svg>
                                 </div>
                             </div>
-
                             <div>
                                 {/* Input contraseña del usuario */}
                                 <label className="text-slate-800 text-sm font-medium mb-2 block">Contraseña</label>
@@ -201,7 +152,6 @@ const Login = ({ setUserLogin }) => {
                                     {/* Renderizamos el modal del Forgot Password */}
                                     {showFPasswordModal && <ForgotPassword setShowFPasswordModal={setShowFPasswordModal} />}
                                     <a
-                                        href="javascript:void(0);"
                                         className="text-blue-600 hover:underline font-medium"
                                         onClick={() => setShowFPasswordModal(true)}>
                                         ¿Olvidaste tu contraseña?
@@ -225,7 +175,6 @@ const Login = ({ setUserLogin }) => {
                                     ¿No tienes una cuenta? {/* Texto en español */}
                                     <a
                                         onClick={() => setShowSignupModal(true)} // Al hacer click, mostramos el modal
-                                        href="javascript:void(0);" // Mantener el href preventivo
                                         className="text-blue-600 font-medium hover:underline ml-1 whitespace-nowrap cursor-pointer"> {/* Añadir cursor-pointer */}
                                         Regístrate aquí
                                     </a>
@@ -233,13 +182,12 @@ const Login = ({ setUserLogin }) => {
                             </div>
                         </form>
                     </div>
-
                     <div className="max-md:mt-8">
                         <img src="https://readymadeui.com/login-image.webp" className="w-full aspect-[71/50] max-md:w-4/5 mx-auto block object-cover" alt="login img" />
                     </div>
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 

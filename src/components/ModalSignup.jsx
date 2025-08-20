@@ -3,113 +3,117 @@ import { ManageAccount } from "../firebaseconnect";
 import Swal from 'sweetalert2'; // Importa SweetAlert
 import { getDocs, getFirestore } from "firebase/firestore";
 import { collection, query, where } from "firebase/firestore";
+// importamos supabase para el registro
+import supabase from "../supabaseClient";
 
 const ModalSignup = ({ setShowModal }) => {
     // Datos importantes para el registro 
-    const [email, setEmail] = useState("");
+    const [mail, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
     const [nickname, setNickname] = useState("")
     // Datos del usuario
     const [nombre, setNombre] = useState("");
-    const [apellido, setApellido] = useState("");
     const [error, setError] = useState(""); // Para errores de validación previa o de Firebase
 
     // Agregamos async para poder usar await
     const handleSignup = async (e) => {
-        e.preventDefault();
-        setError(""); // Limpiar errores previos
+    e.preventDefault();
+    setError(""); // Limpiar errores previos
 
-        if (!email || !password) {
-            setError("Completa correo y contraseña");
-            return;
-        }
-
-        const db = getFirestore();
-
-        // Verificamos la existencia del nickname
-        const qNickname = query(collection(db, "users"), where("nickname", "==", nickname));
-        const querySnapshotNickname = await getDocs(qNickname);
-
-        if (!querySnapshotNickname.empty) {
-            setError("Nickname en uso, intentalo con otro");
-            return;
-        }
-
-        // Verificamos la existencia del mail
-        const qMail = query(collection(db, "users"), where("mail", "==", email));
-        const querySnapshotMail = await getDocs(qMail);
-
-        if (!querySnapshotNickname.empty) {
-            setError("Mail en uso, intentalo con otro");
-            return;
-        }
-
-        // Instanciamos la clase
-        const account = new ManageAccount();
-
-        try {
-            // Usamos await para esperar la respuesta de Firebase
-            const result = await account.register(email, password);
-
-            if (result.success) {
-                // Registro exitoso
-                const userId = result.user.uid;
-
-                // Guardamos los datos en firestore
-                const saveResult = await account.saveData("users", userId, {
-                    nombre,
-                    apellido,
-                    nickname,
-                    email
-                });
-
-                if (!saveResult.success) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudieron guardar los datos adicionales'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Registro Exitoso!',
-                        text: 'Tu cuenta ha sido creada.',
-                        timer: 2000 // Opcional: cierra la alerta después de 2 segundos
-                    });
-
-                    setShowModal(false)
-                }
-            } else {
-                // Hubo un error en el registro (validación de Firebase, email ya usado, etc.)
-                // Puedes mostrar un mensaje de error más específico basado en result.message
-                console.error("Error de registro de Firebase:", result.message); // Log para depuración
-
-                let friendlyErrorMessage = 'Ocurrió un error al registrar. Intenta de nuevo.';
-                if (result.message.includes('auth/email-already-in-use')) {
-                    friendlyErrorMessage = 'El correo electrónico ya está registrado.';
-                } else if (result.message.includes('auth/invalid-email')) {
-                    friendlyErrorMessage = 'El formato del correo electrónico no es válido.';
-                } else if (result.message.includes('auth/weak-password')) {
-                    friendlyErrorMessage = 'La contraseña es demasiado débil. Debe tener al menos 6 caracteres.';
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de Registro',
-                    text: friendlyErrorMessage,
-                });
-                setError(friendlyErrorMessage); // Opcional: también mostrar debajo del formulario
-            }
-        } catch (err) {
-            // Captura cualquier otro error inesperado
-            console.error("Error inesperado durante el registro:", err);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Ocurrió un error inesperado. Intenta de nuevo.',
-            });
-            setError('Ocurrió un error inesperado.');
-        }
+    if (!mail || !password) {
+        setError("Completa correo y contraseña");
+        return;
     }
+
+    // Verificamos si existe el nickname en supabase
+    let { data: nickData } = await supabase
+        .from("users")
+        .select("uid")
+        .eq("nickname", nickname)
+        .single();
+
+    if (nickData) {
+        setError("Nickname en uso, intentalo con otro");
+        return;
+    }
+
+    // Saneamos mail para evitar injections
+ 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(mail)) {
+        setError("El correo no es válido");
+        return;
+    }
+
+    // Saneamos nickname
+    const nicknameRegex = /^(?!.*[.]{2})[a-zA-Z0-9](?:[a-zA-Z0-9._]{1,28}[a-zA-Z0-9])?$/;
+    if (!nicknameRegex.test(nickname)) {
+        setError("El nickname solo puede contener letras, números, puntos y guion bajo, sin espacios ni caracteres especiales, y no puede empezar o terminar con punto o guion bajo.");
+        return;
+    }
+
+    // Verificamos si existe el mail en supabase
+    let { data: mailData } = await supabase
+        .from("users")
+        .select("uid")
+        .eq("email", mail)
+        .single();
+
+    if (mailData) {
+        setError("Mail en uso, intentalo con otro");
+        return;
+    }
+
+    // Validamos que el usuario este seguro de la contraseña
+    if (password !== repeatPassword) {
+        setError("Las contraseñas no coinciden");
+        return;
+    }
+
+    // 1. Registramos en Supabase Auth PRIMERO
+    const { error: supaAuthError } = await supabase.auth.signUp({ email: mail, password });
+    if (supaAuthError) {
+        setError("Error al registrar en Supabase Auth: " + supaAuthError.message);
+        return;
+    }
+
+    // 2. Registramos en Firebase
+    const account = new ManageAccount();
+    const result = await account.register(mail, password, nickname);
+    if (!result.success) {
+        setError(result.message || "Error al registrar en firebase");
+        // Opcional: aquí podrías borrar el usuario de Supabase Auth si quieres mantener sincronía
+        return;
+    }
+
+    const userUid = result.user.uid;
+
+    // 3. Registramos en tabla users de Supabase
+    const { error: supaError } = await supabase
+        .from("users")
+        .insert([{
+            uid: userUid,
+            name: nombre,
+            nickname: nickname,
+            email: mail,
+            created_at: new Date().toISOString()
+        }]);
+
+    if (supaError) {
+        setError("Error al registrar en Supabase: " + supaError.message);
+        return;
+    }
+
+    Swal.fire({
+        icon: 'success',
+        title: '¡Registro Exitoso!',
+        text: 'Tu cuenta ha sido creada.',
+        timer: 2000
+    });
+
+    setShowModal(false);
+};
 
     return (
         // ... (el resto de tu JSX es correcto)
@@ -139,17 +143,6 @@ const ModalSignup = ({ setShowModal }) => {
                                 onChange={e => setNombre(e.target.value)}
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Apellido</label>
-                            <input
-                                type="text"
-                                className="form-input w-full border rounded px-2 py-1"
-                                placeholder="Ejemplo Apellido"
-                                autoComplete="off"
-                                value={apellido}
-                                onChange={e => setApellido(e.target.value)}
-                            />
-                        </div>
                         {/* --------------------------------------------- */}
                         <div>
                             <label className="block text-sm font-medium mb-1">Nick name</label>
@@ -162,9 +155,6 @@ const ModalSignup = ({ setShowModal }) => {
                                 onChange={e => setNickname(e.target.value)}
                             />
                         </div>
-                        <div>
-                            <br />
-                        </div>
                         {/* --------------------------------------------- */}
                         <div>
                             <label className="block text-sm font-medium mb-1">Correo</label>
@@ -173,10 +163,11 @@ const ModalSignup = ({ setShowModal }) => {
                                 className="form-input w-full border rounded px-2 py-1"
                                 placeholder="name@example.com"
                                 autoComplete="off"
-                                value={email}
+                                value={mail}
                                 onChange={e => setEmail(e.target.value)}
                             />
                         </div>
+                        <span/>
                         <div>
                             <label className="block text-sm font-medium mb-1">Contraseña</label>
                             <input
@@ -186,6 +177,17 @@ const ModalSignup = ({ setShowModal }) => {
                                 autoComplete="off"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Repite contraseña</label>
+                            <input
+                                type="password"
+                                className="form-input w-full border rounded px-2 py-1"
+                                placeholder="Contraseña"
+                                autoComplete="off"
+                                value={repeatPassword}
+                                onChange={e => setRepeatPassword(e.target.value)}
                             />
                         </div>
                     </div>

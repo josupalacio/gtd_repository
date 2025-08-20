@@ -15,7 +15,10 @@ import Dashboard from "./pages/Dashboard";
 import ChatBot from "./pages/Chatbot";
 import EditProfile from "./pages/EditProfile";
 import Forum from "./pages/Forum";
+import Messages from "./pages/Messages";
 import Profile from "./pages/Profile"
+import Pomodoro from "./pages/Pomodoro/Pomodoro"
+import Checklist from "./pages/Checklist/Checklist"
 
 
 // Firebase imports
@@ -89,14 +92,35 @@ function App() {
               onSignOut={handleSignOut} // <-- ¡Aquí pasamos la función para cerrar sesión!
             />
             <MainContent>
-              
+
               <Routes>
                 {/* Rutas protegidas que solo se ven si currentUserData no es null */}
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/chatbot" element={<ChatBot />} />
-                <Route path="/editprofile" element={<EditProfile />} />
+                <Route path="/Chatbot" element={<ChatBot />} />
+                <Route path="/Messages" element={<Messages />} />
+                <Route path="/editprofile" element={
+                  <EditProfile
+                    userId={currentUserData.firebaseUser.uid}
+                    initialName={currentUserData.firestoreData?.nickname || ""}
+                    initialAvatar={currentUserData.firestoreData?.avatar || ""}
+                    theme={theme}
+                    onSave={updated => {
+                      // Actualiza el estado global para refrescar Sidebar y otros componentes
+                      setCurrentUserData(prev => ({
+                        ...prev,
+                        firestoreData: {
+                          ...prev.firestoreData,
+                          ...updated
+                        }
+                      }));
+                    }}
+                  />
+                }
+                />
                 <Route path="/forum" element={<Forum />} />
                 <Route path="/profile" element={<Profile user={currentUserData} />} />
+                <Route path="/pomodoro" element={<Pomodoro />} />
+                <Route path="/Checklist" element={<Checklist />} />
                 {/* Agregamos Navigate para redirigir si el usuario va a una ruta no definida mientras está logueado */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
@@ -109,6 +133,8 @@ function App() {
 }
 
 const Container = styled.div`
+  height: 100vh;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 90px auto;
   background: ${({ theme }) => theme.bgtotal};
@@ -122,7 +148,6 @@ const Container = styled.div`
 const MainContent = styled.div`
   padding: 2rem;
   height: 100vh;
-  overflow-y: auto;
 `;
 
 export default App;
