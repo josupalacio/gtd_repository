@@ -1,0 +1,151 @@
+/* CONTENEDOR PRINCIPAL */
+* {
+    font-family: "Poppins", sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    margin: 0;
+}
+
+.pomodoro-header {
+    padding-top: 0;
+    margin-top: 0;
+    align-self: start;
+    background-color: #0077cc;
+    border-bottom: 1px solid #f6f6f6;
+    padding: 1rem 1.2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+}
+
+.pomodoro-body {
+    padding: 1.5rem 1.5rem;
+}
+
+.wrapper {
+    /* Estilos */
+    text-align: center;
+    background-color: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 0 0.5rem;
+    box-shadow: 0px 35px 80px rgba(0, 0, 0, 0.05);
+    overflow: auto;
+    align-content: center;
+
+    width: 22rem;
+    height: 25rem;
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* PROGRESS BAR */
+.progress {
+    margin: 0 auto 24px auto;
+    width: 200px;
+}
+
+/* CONTROLES */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.controls svg {
+    width: 32px;
+    width: 32px;
+    fill: black;
+    stroke: black;
+}
+
+/* BOTONES CIRCULARES */
+.circle-button {
+    background-color: transparent;
+    color: var(--text);
+    border: 0;
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.circle-button:hover {
+    background-color: var(--bg3);
+}
+
+.back-button {
+    font-size: 20px;
+    border: 5px;
+    rotate: 180deg;
+    transform: scaleY(-1);
+}
+
+/* AJUSTES */
+.settings-content {
+    text-align: left;
+}
+
+.settings-content label {
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    text-transform: capitalize;
+}
+
+/* DIV VOLVER */
+.back-div {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* SLIDER (ya lo tenías) */
+.slider {
+    height: 40px;
+    border: 2px solid var(--red);
+    border-radius: 20px;
+    width: 100%;
+    margin: 10px 0 20px 0;
+}
+
+.slider.green {
+    border: 2px solid var(--green);
+}
+
+.thumb {
+    background-color: var(--red);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+
+.slider.green .thumb {
+    background-color: var(--green);
+}
+
+.track {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg4);
+}
+
+.slider.green .track {
+    background: var(--bg4);
+}

@@ -10,7 +10,7 @@
     padding-top: 15px;
     padding-bottom: 15px;
     width: 100vw;
-    height: 100vh;
+    height: 92vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -60,7 +60,7 @@ label {
     color: #343434;
     margin-left: 0.5rem;
     cursor: pointer;
-}
+}A
 
 .hoverable-task {
     position: relative;
