@@ -100,7 +100,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, user, onSignOut }) {
                     className="theme-swither"
                     onClick={CambiarTheme}
                   />
-                  <span istheme={theme} className="slider round"></span>
+                  <span istheme={theme} className="slider-sidebar round"></span>
                 </label>
               </div>
             </div>
@@ -318,13 +318,13 @@ const Container = styled.div`
               opacity: 0;
               width: 0;
               height: 0;
-              &:checked + .slider:before {
+              &:checked + .slider-sidebar:before {
                 left: 4px;
                 content: "🌑";
                 transform: translateX(26px);
               }
             }
-            .slider {
+            .slider-sidebar {
               position: absolute;
               cursor: pointer;
               top: 0;

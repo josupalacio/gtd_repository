@@ -41,7 +41,7 @@
     align-content: center;
 
     width: 22rem;
-    height: 25rem;
+    height: 28rem;
     padding: 0;
     margin: 0;
 
@@ -51,16 +51,21 @@
 
 /* PROGRESS BAR */
 .progress {
+    margin-top: 2rem;
     margin: 0 auto 24px auto;
-    width: 200px;
+    width: 12.5rem;
+}
+
+.current-round-info {
+    margin-top: 2rem;
 }
 
 /* CONTROLES */
 .controls {
     display: flex;
     justify-content: center;
-    gap: 16px;
-    margin-top: 24px;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .controls svg {
@@ -96,6 +101,19 @@
 }
 
 /* AJUSTES */
+.pomodoro-settings-body {
+    padding: 1.5rem 1.5rem;
+    height: 100%;
+    width: 100%;
+    align-content: center;
+}
+
+.box-sliders {
+    width: auto;
+    height: 12.5rem;
+    align-content: center;
+}
+
 .settings-content {
     text-align: left;
 }
@@ -113,39 +131,46 @@
     margin-top: 20px;
 }
 
-/* SLIDER (ya lo tenías) */
+/* SLIDER*/
 .slider {
-    height: 40px;
-    border: 2px solid var(--red);
-    border-radius: 20px;
+    height: 24px;
+    display: flex;
+    align-items: center;
     width: 100%;
-    margin: 10px 0 20px 0;
-}
-
-.slider.green {
-    border: 2px solid var(--green);
-}
-
-.thumb {
-    background-color: var(--red);
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-}
-
-.slider.green .thumb {
-    background-color: var(--green);
+    margin: 20px 0;
+    position: relative;
 }
 
 .track {
-    top: 50%;
-    transform: translateY(-50%);
     height: 8px;
     border-radius: 4px;
-    background: var(--bg4);
 }
 
-.slider.green .track {
-    background: var(--bg4);
+/* Color del track "activo" (parte izquierda) */
+.track.track-0 {
+    background-color: #0077cc;
+}
+
+/* Color del track inactivo (parte derecha) */
+.track.track-1 {
+    background-color: #ccc;
+}
+
+/* Color del thumb */
+.thumb {
+    width: 24px;
+    height: 24px;
+    background-color: #0077cc;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: grab;
+}
+
+.settings-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+    height: 4rem;
+    align-items: center;
 }
